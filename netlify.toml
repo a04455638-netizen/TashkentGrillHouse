@@ -1,0 +1,59 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Security & Performance Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Long-term Cache for Immutable Fonts & Images
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Clean URL Redirects
+[[redirects]]
+  from = "/ru"
+  to = "/ru/"
+  status = 301
+
+[[redirects]]
+  from = "/en"
+  to = "/en/"
+  status = 301
+
+[[redirects]]
+  from = "/menu"
+  to = "/ru/menu"
+  status = 302
+
+[[redirects]]
+  from = "/reservation"
+  to = "/ru/reservation"
+  status = 302
+
+[[redirects]]
+  from = "/order"
+  to = "/ru/order"
+  status = 302

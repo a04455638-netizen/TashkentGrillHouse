@@ -2208,6 +2208,9 @@ body {
     padding-top: calc(var(--hdr) + 20px);
     padding-bottom: 40px;
   }
+  .hero__table {
+    display: none !important;
+  }
   .hero__h1 {
     font-size: 38px;
   }
@@ -2263,3 +2266,147 @@ body {
     gap: 16px;
   }
 }
+
+
+/* ====================================================================
+   HERO INSTANT LUXURY VISIBILITY OVERRIDES (NO 5-SECOND BLANK SCREEN)
+   ==================================================================== */
+.intro .hdr, .intro-quick .hdr,
+.intro [data-hero-copy], .intro-quick [data-hero-copy],
+.intro .hero [data-plate-in], .intro-quick .hero [data-plate-in],
+.intro #heroLogo .lg-flame, .intro-quick #heroLogo .lg-flame,
+.intro #heroLogo .lg-bowl, .intro-quick #heroLogo .lg-bowl,
+.intro #heroLogo .lg-cut, .intro-quick #heroLogo .lg-cut,
+.intro #heroLogo .lg-word, .intro-quick #heroLogo .lg-word,
+.intro #heroLogo .lg-sub, .intro-quick #heroLogo .lg-sub,
+.intro #heroLogo .lg-flower, .intro-quick #heroLogo .lg-flower,
+.intro #heroLogo .lg-ring, .intro-quick #heroLogo .lg-ring,
+.intro #heroLogo .lg-ember, .intro-quick #heroLogo .lg-ember {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.intro #heroLogo .lg-rosette path, .intro-quick #heroLogo .lg-rosette path {
+  fill-opacity: 1 !important;
+  stroke-width: 0 !important;
+}
+
+.site-preloader {
+  display: none !important;
+}
+
+.hero__logo {
+  display: block !important;
+  width: clamp(100px, 11vw, 140px) !important;
+  height: clamp(100px, 11vw, 140px) !important;
+  aspect-ratio: 1 !important;
+  margin: 0 auto 16px !important;
+  filter: drop-shadow(0 0 16px rgba(211, 186, 116, 0.45));
+}
+
+.hero__logo .logo {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hero {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: calc(var(--hdr) + 20px) 0 40px !important;
+  overflow: visible !important;
+}
+
+.hero__center {
+  max-width: 880px !important;
+  width: 90% !important;
+  margin: 0 auto !important;
+  z-index: 5 !important;
+}
+
+.plate--plov {
+  width: clamp(260px, 28vw, 440px) !important;
+  right: -2vw !important;
+  bottom: -4vw !important;
+  z-index: 2 !important;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.85)) !important;
+}
+
+.plate--shashlik {
+  width: clamp(180px, 18vw, 300px) !important;
+  right: 2vw !important;
+  top: 10vh !important;
+  z-index: 2 !important;
+  filter: drop-shadow(0 16px 35px rgba(0, 0, 0, 0.75)) !important;
+}
+
+.plate--lagman {
+  width: clamp(180px, 20vw, 320px) !important;
+  left: 2vw !important;
+  bottom: 2vh !important;
+  z-index: 2 !important;
+  filter: drop-shadow(0 16px 35px rgba(0, 0, 0, 0.75)) !important;
+}
+
+.plate--samsa {
+  width: clamp(150px, 16vw, 250px) !important;
+  left: 2vw !important;
+  top: 10vh !important;
+  z-index: 2 !important;
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.75)) !important;
+}
+
+/* ====================================================================
+   HIGH CONTRAST LUXURY HEADINGS & TYPOGRAPHY
+   ==================================================================== */
+.plov h2,
+.chef h2,
+.hall h2,
+.visit h2,
+.plov__text h2,
+.chef__text h2,
+.hall__text h2,
+.visit__text h2,
+#hallH,
+#plovH,
+#chefH {
+  color: var(--cream) !important;
+  font-family: var(--display) !important;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
+}
+
+.plov__lead-text,
+.chef__body,
+.hall__text p {
+  color: var(--cream-2) !important;
+  font-family: var(--sans) !important;
+  line-height: 1.7 !important;
+}
+
+.plov__steps li {
+  color: var(--cream-2) !important;
+  border-bottom: 1px solid rgba(211, 186, 116, 0.18) !important;
+}
+
+.plov__steps li b {
+  color: var(--gold) !important;
+}
+
+.plov__quote blockquote {
+  color: var(--cream) !important;
+}
+
+.plov__quote figcaption {
+  color: var(--gold) !important;
+}
+
+.plov__proof {
+  color: var(--cream-2) !important;
+}
+
+.plov__proof b {
+  color: var(--gold) !important;
+}
+

@@ -34,12 +34,7 @@ function renderHomepage(lang) {
     var d = document.documentElement;
     d.classList.replace('no-js', 'js');
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var seen = false;
-    try { seen = sessionStorage.getItem('tgh-intro') === '1'; } catch (e) {}
-    if (rm) d.classList.add('rm');
-    else d.classList.add(seen ? 'intro-quick' : 'intro');
-    setTimeout(function () { if (!window.__tgh) d.classList.remove('intro', 'intro-quick'); }, 3500);
+    try { sessionStorage.setItem('tgh-intro', '1'); } catch (e) {}
   })();
 </script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Restaurant","name":"Tashkent Grill House","servesCuisine":["Uzbek","Central Asian","Georgian"],"address":{"@type":"PostalAddress","streetAddress":"1995 Springbrook Square Dr #107","addressLocality":"Naperville","addressRegion":"IL","postalCode":"60564","addressCountry":"US"},"sameAs":["https://www.instagram.com/tashkentgrillhouse.chicago/"]}</script>

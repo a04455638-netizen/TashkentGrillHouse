@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /.netlify/
-
-Sitemap: https://tashkent-grill-house.netlify.app/sitemap.xml

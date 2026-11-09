@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/.netlify/functions/:match*",
+      "destination": "/api/:match*"
+    },
+    {
+      "source": "/ru",
+      "destination": "/ru/index.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en/index.html"
+    }
+  ]
+}

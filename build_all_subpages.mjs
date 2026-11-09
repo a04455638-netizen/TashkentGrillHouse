@@ -10,18 +10,19 @@ function renderHeader(lang, activePage) {
   const otherPrefix = isEn ? '/ru' : '/en';
 
   return `
-<header class="hdr is-solid" data-hdr style="background:var(--night-2); border-bottom:1px solid rgba(211,186,116,0.15);">
+<header class="hdr is-solid" data-hdr>
   <a class="hdr__brand" href="${prefix}/" aria-label="Tashkent Grill House">
     <svg class="hdr__mark" viewBox="0 0 621 621" aria-hidden="true" focusable="false">
-      <use href="#lg-ring"/>
+      <use href="#lg-rosette"/>
       <use href="#lg-flame"/>
+      <use href="#lg-bowl"/>
     </svg>
-    <span class="hdr__word">Tashkent</span>
-    <span class="hdr__sub">Grill House</span>
+    <span>Tashkent <em>Grill House</em></span>
   </a>
 
-  <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="hdrNav" aria-label="${isEn ? 'Navigation' : 'Разделы'}" data-nav-toggle>
-    <span></span><span></span>
+  <button class="hdr__toggle" type="button" aria-expanded="false" aria-controls="hdrNav" aria-label="${isEn ? 'Navigation' : 'Разделы'}" data-nav-toggle>
+    <span>${isEn ? 'Sections' : 'Разделы'}</span>
+    <i aria-hidden="true"></i>
   </button>
 
   <nav class="hdr__nav" id="hdrNav" aria-label="${isEn ? 'Navigation' : 'Разделы'}">
@@ -35,7 +36,7 @@ function renderHeader(lang, activePage) {
   </nav>
 
   <a class="hdr__lang" href="${otherPrefix}/${activePage === 'home' ? '' : activePage}" hreflang="${otherLang}" lang="${otherLang}" aria-label="${isEn ? 'Русский' : 'English'}">${isEn ? 'RU' : 'EN'}</a>
-  <a class="btn btn--gold btn--sm hdr__cta" href="${prefix}/reservation">${isEn ? 'Reserve' : 'Бронь'}</a>
+  <a class="btn btn--luxury btn--sm hdr__cta" href="${prefix}/reservation">${isEn ? 'Reserve' : 'Бронь'}</a>
 </header>
   `;
 }
@@ -47,30 +48,67 @@ function renderFooter(lang) {
   const otherPrefix = isEn ? '/ru' : '/en';
 
   return `
-<footer class="ftr" style="margin-top:auto;">
-  <div class="ftr__in shell">
-    <a class="ftr__brand" href="${prefix}/" aria-label="Tashkent Grill House">
-      <svg class="ftr__logo" viewBox="0 0 621 621" aria-hidden="true" focusable="false" style="width:54px; height:54px;">
-        <use href="#lg-ring"/>
-        <use href="#lg-flame"/>
-        <use href="#lg-bowl"/>
-      </svg>
-      <div>
-        <p class="ftr__name">Tashkent Grill House</p>
-        <p class="ftr__copy">1995 Springbrook Square Dr #107, Naperville, IL 60564</p>
+<footer class="ftr-luxury" style="margin-top:auto;">
+  <div class="ftr-grid">
+    <div class="ftr-col">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <svg viewBox="0 0 621 621" style="width:48px; height:48px; fill:var(--gold);" aria-hidden="true">
+          <use href="#lg-rosette"/><use href="#lg-flame"/><use href="#lg-bowl"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--display); font-size:22px; color:var(--cream);">Tashkent Grill House</div>
+          <div style="font-family:var(--cond); font-size:12px; letter-spacing:0.18em; color:var(--gold); text-transform:uppercase;">${isEn ? 'Authentic Uzbek Cuisine' : 'Узбекская кухня'}</div>
+        </div>
       </div>
-    </a>
-    <p class="ftr__links">
-      <a href="${prefix}/menu">${isEn ? 'Menu' : 'Меню'}</a>
-      <a href="${prefix}/reservation">${isEn ? 'Reservations' : 'Бронирование'}</a>
-      <a href="${prefix}/order">${isEn ? 'Ordering' : 'Доставка и вынос'}</a>
-      <a href="${prefix}/order/track">${isEn ? 'Track Order' : 'Отследить заказ'}</a>
-      <a href="${prefix}/about">${isEn ? 'Chef & Story' : 'Шеф и история'}</a>
-      <a href="https://www.instagram.com/tashkentgrillhouse.chicago/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=Tashkent%20Grill%20House%2C%201995%20Springbrook%20Square%20Dr%20%23107%2C%20Naperville%2C%20IL%2060564" target="_blank" rel="noopener">${isEn ? 'Directions' : 'Маршрут'}</a>
-      <a href="${otherPrefix}/" hreflang="${otherLang}" lang="${otherLang}">${isEn ? 'Русский' : 'English'}</a>
-      <a href="/admin" style="opacity:0.6; font-size:13px;">Admin</a>
-    </p>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-dim); max-width:320px;">
+        ${isEn 
+          ? 'Bringing centuries of Central Asian hospitality, traditional copper-kazan plov, and open-charcoal grilling to Naperville, Illinois.'
+          : 'Вековые традиции восточного гостеприимства, плов из дровяного казана и ароматный гриль на углях в Нейпервилле, Иллинойс.'}
+      </p>
+      <div class="ftr-social-pills">
+        <a href="https://www.instagram.com/tashkentgrillhouse.chicago/" target="_blank" rel="noopener" class="ftr-social-pill" aria-label="Instagram">IG</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Tashkent%20Grill%20House%2C%201995%20Springbrook%20Square%20Dr%20%23107%2C%20Naperville%2C%20IL%2060564" target="_blank" rel="noopener" class="ftr-social-pill" aria-label="Maps">MAP</a>
+      </div>
+    </div>
+
+    <div class="ftr-col">
+      <h4>${isEn ? 'Culinary Menu' : 'Меню ресторана'}</h4>
+      <ul>
+        <li><a href="${prefix}/menu">${isEn ? 'Full Interactive Menu' : 'Полное меню'}</a></li>
+        <li><a href="${prefix}/#plov">${isEn ? 'Signature Tashkent Plov' : 'Ташкентский плов'}</a></li>
+        <li><a href="${prefix}/#menu">${isEn ? 'Charcoal Shashlik' : 'Шашлык на углях'}</a></li>
+        <li><a href="${prefix}/#menu">${isEn ? 'Hand-Pulled Lagman' : 'Тянутый лагман'}</a></li>
+        <li><a href="${prefix}/#menu">${isEn ? 'Tandyr Breads & Samsa' : 'Выпечка из тандыра'}</a></li>
+      </ul>
+    </div>
+
+    <div class="ftr-col">
+      <h4>${isEn ? 'Guest Services' : 'Сервисы для гостей'}</h4>
+      <ul>
+        <li><a href="${prefix}/reservation">${isEn ? 'Online Table Reservation' : 'Бронирование столика'}</a></li>
+        <li><a href="${prefix}/order">${isEn ? 'Curbside Order Pickup' : 'Заказ на вынос'}</a></li>
+        <li><a href="${prefix}/order/track">${isEn ? 'Live Order Tracking' : 'Отслеживание заказа'}</a></li>
+        <li><a href="${prefix}/account">${isEn ? 'Guest Profile & Bookings' : 'Личный кабинет'}</a></li>
+        <li><a href="/admin">${isEn ? 'Staff & Manager Portal' : 'Портал администратора'}</a></li>
+      </ul>
+    </div>
+
+    <div class="ftr-col">
+      <h4>${isEn ? 'Location & Hours' : 'Контакты и время'}</h4>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-2); margin-bottom:12px;">
+        1995 Springbrook Square Dr #107<br>Naperville, IL 60564
+      </p>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-dim);">
+        ${isEn ? 'Tue – Sun: 11:30 AM – 9:30 PM' : 'Вт – Вс: 11:30 – 21:30'}<br>
+        ${isEn ? 'Monday: Closed' : 'Понедельник: выходной'}
+      </p>
+    </div>
+  </div>
+
+  <div class="ftr-bottom">
+    <div>© 2026 Tashkent Grill House. ${isEn ? 'All rights reserved.' : 'Все права защищены.'}</div>
+    <div>${isEn ? '100% Halal Meats · Crafted with Authentic Central Asian Spices' : '100% Халяль · Традиционные восточные специи'}</div>
+    <div><a href="${otherPrefix}/" style="color:var(--gold);">${isEn ? 'Русская версия (RU)' : 'English Version (EN)'}</a></div>
   </div>
 </footer>
   `;

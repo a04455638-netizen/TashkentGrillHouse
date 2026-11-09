@@ -33,18 +33,19 @@
   </div>
 
   
-<header class="hdr is-solid" data-hdr style="background:var(--night-2); border-bottom:1px solid rgba(211,186,116,0.15);">
+<header class="hdr is-solid" data-hdr>
   <a class="hdr__brand" href="/en/" aria-label="Tashkent Grill House">
     <svg class="hdr__mark" viewBox="0 0 621 621" aria-hidden="true" focusable="false">
-      <use href="#lg-ring"/>
+      <use href="#lg-rosette"/>
       <use href="#lg-flame"/>
+      <use href="#lg-bowl"/>
     </svg>
-    <span class="hdr__word">Tashkent</span>
-    <span class="hdr__sub">Grill House</span>
+    <span>Tashkent <em>Grill House</em></span>
   </a>
 
-  <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="hdrNav" aria-label="Navigation" data-nav-toggle>
-    <span></span><span></span>
+  <button class="hdr__toggle" type="button" aria-expanded="false" aria-controls="hdrNav" aria-label="Navigation" data-nav-toggle>
+    <span>Sections</span>
+    <i aria-hidden="true"></i>
   </button>
 
   <nav class="hdr__nav" id="hdrNav" aria-label="Navigation">
@@ -58,7 +59,7 @@
   </nav>
 
   <a class="hdr__lang" href="/ru/order/track" hreflang="ru" lang="ru" aria-label="Русский">RU</a>
-  <a class="btn btn--gold btn--sm hdr__cta" href="/en/reservation">Reserve</a>
+  <a class="btn btn--luxury btn--sm hdr__cta" href="/en/reservation">Reserve</a>
 </header>
   
 
@@ -88,30 +89,65 @@
   </main>
 
   
-<footer class="ftr" style="margin-top:auto;">
-  <div class="ftr__in shell">
-    <a class="ftr__brand" href="/en/" aria-label="Tashkent Grill House">
-      <svg class="ftr__logo" viewBox="0 0 621 621" aria-hidden="true" focusable="false" style="width:54px; height:54px;">
-        <use href="#lg-ring"/>
-        <use href="#lg-flame"/>
-        <use href="#lg-bowl"/>
-      </svg>
-      <div>
-        <p class="ftr__name">Tashkent Grill House</p>
-        <p class="ftr__copy">1995 Springbrook Square Dr #107, Naperville, IL 60564</p>
+<footer class="ftr-luxury" style="margin-top:auto;">
+  <div class="ftr-grid">
+    <div class="ftr-col">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <svg viewBox="0 0 621 621" style="width:48px; height:48px; fill:var(--gold);" aria-hidden="true">
+          <use href="#lg-rosette"/><use href="#lg-flame"/><use href="#lg-bowl"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--display); font-size:22px; color:var(--cream);">Tashkent Grill House</div>
+          <div style="font-family:var(--cond); font-size:12px; letter-spacing:0.18em; color:var(--gold); text-transform:uppercase;">Authentic Uzbek Cuisine</div>
+        </div>
       </div>
-    </a>
-    <p class="ftr__links">
-      <a href="/en/menu">Menu</a>
-      <a href="/en/reservation">Reservations</a>
-      <a href="/en/order">Ordering</a>
-      <a href="/en/order/track">Track Order</a>
-      <a href="/en/about">Chef & Story</a>
-      <a href="https://www.instagram.com/tashkentgrillhouse.chicago/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=Tashkent%20Grill%20House%2C%201995%20Springbrook%20Square%20Dr%20%23107%2C%20Naperville%2C%20IL%2060564" target="_blank" rel="noopener">Directions</a>
-      <a href="/ru/" hreflang="ru" lang="ru">Русский</a>
-      <a href="/admin" style="opacity:0.6; font-size:13px;">Admin</a>
-    </p>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-dim); max-width:320px;">
+        Bringing centuries of Central Asian hospitality, traditional copper-kazan plov, and open-charcoal grilling to Naperville, Illinois.
+      </p>
+      <div class="ftr-social-pills">
+        <a href="https://www.instagram.com/tashkentgrillhouse.chicago/" target="_blank" rel="noopener" class="ftr-social-pill" aria-label="Instagram">IG</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Tashkent%20Grill%20House%2C%201995%20Springbrook%20Square%20Dr%20%23107%2C%20Naperville%2C%20IL%2060564" target="_blank" rel="noopener" class="ftr-social-pill" aria-label="Maps">MAP</a>
+      </div>
+    </div>
+
+    <div class="ftr-col">
+      <h4>Culinary Menu</h4>
+      <ul>
+        <li><a href="/en/menu">Full Interactive Menu</a></li>
+        <li><a href="/en/#plov">Signature Tashkent Plov</a></li>
+        <li><a href="/en/#menu">Charcoal Shashlik</a></li>
+        <li><a href="/en/#menu">Hand-Pulled Lagman</a></li>
+        <li><a href="/en/#menu">Tandyr Breads & Samsa</a></li>
+      </ul>
+    </div>
+
+    <div class="ftr-col">
+      <h4>Guest Services</h4>
+      <ul>
+        <li><a href="/en/reservation">Online Table Reservation</a></li>
+        <li><a href="/en/order">Curbside Order Pickup</a></li>
+        <li><a href="/en/order/track">Live Order Tracking</a></li>
+        <li><a href="/en/account">Guest Profile & Bookings</a></li>
+        <li><a href="/admin">Staff & Manager Portal</a></li>
+      </ul>
+    </div>
+
+    <div class="ftr-col">
+      <h4>Location & Hours</h4>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-2); margin-bottom:12px;">
+        1995 Springbrook Square Dr #107<br>Naperville, IL 60564
+      </p>
+      <p style="font-size:14px; line-height:1.6; color:var(--cream-dim);">
+        Tue – Sun: 11:30 AM – 9:30 PM<br>
+        Monday: Closed
+      </p>
+    </div>
+  </div>
+
+  <div class="ftr-bottom">
+    <div>© 2026 Tashkent Grill House. All rights reserved.</div>
+    <div>100% Halal Meats · Crafted with Authentic Central Asian Spices</div>
+    <div><a href="/ru/" style="color:var(--gold);">Русская версия (RU)</a></div>
   </div>
 </footer>
   

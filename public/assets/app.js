@@ -302,6 +302,9 @@
     if (document.getElementById('reviewsContainer')) {
       renderReviews(isEn);
     }
+
+    // Homepage Interactive Features (Redesign V3)
+    initHomepageFeatures(isEn);
   });
 
   // Preloader Logic
@@ -980,6 +983,140 @@
       location.reload();
     }
   };
+
+  // Homepage Interactive Features (Redesign V3)
+  function initHomepageFeatures(isEn) {
+    // 1. Menu Category Filtering
+    const filterBtns = document.querySelectorAll('.menu-filter-btn');
+    const menuCards = document.querySelectorAll('.menu-card');
+    if (filterBtns.length > 0 && menuCards.length > 0) {
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const cat = btn.getAttribute('data-filter');
+          menuCards.forEach(card => {
+            if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+              card.style.display = 'flex';
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+    }
+
+    // 2. Add to Order from Homepage Cards
+    document.querySelectorAll('.btn-card-order').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slug = btn.getAttribute('data-slug');
+        if (slug && cart) {
+          cart.add(slug, 1);
+          const originalText = btn.innerHTML;
+          btn.innerHTML = isEn ? '✓ Added' : '✓ Добавлено';
+          btn.style.background = '#2ecc71';
+          btn.style.color = '#fff';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+            btn.style.color = '';
+          }, 1400);
+        }
+      });
+    });
+
+    // 3. View Details Modal
+    document.querySelectorAll('.btn-card-details').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slug = btn.getAttribute('data-slug');
+        const dish = MENU_DATA.find(d => d.slug === slug);
+        if (!dish) return;
+        const name = isEn ? dish.name_en : dish.name_ru;
+        const desc = isEn ? dish.desc_en : dish.desc_ru;
+        const pairing = isEn ? dish.pairing_en : dish.pairing_ru;
+        const rawAllergens = isEn ? dish.allergens_en : dish.allergens;
+        const allergens = (Array.isArray(rawAllergens) && rawAllergens.length > 0) ? rawAllergens.join(', ') : (isEn ? 'None' : 'Нет');
+        showModal({
+          title: name,
+          icon: '🍽️',
+          message: `
+            <div style="text-align:left; font-size:15px; color:var(--cream-2);">
+              <p style="margin-bottom:14px; line-height:1.6;">${desc}</p>
+              <div style="background:rgba(211,186,116,0.1); border-left:3px solid var(--gold); padding:10px 14px; border-radius:0 6px 6px 0; margin-bottom:12px;">
+                <b style="color:var(--gold-2);">${isEn ? 'Chef Pairing Recommendation:' : 'Рекомендация шефа:'}</b><br>
+                <span>${pairing}</span>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:13px; color:var(--cream-dim);">
+                <div><b>${isEn ? 'Calories:' : 'Калорийность:'}</b> ${dish.calories} kcal</div>
+                <div><b>${isEn ? 'Portion:' : 'Выход:'}</b> ${dish.weight_g} g</div>
+                <div style="grid-column:span 2;"><b>${isEn ? 'Allergens:' : 'Аллергены:'}</b> ${allergens}</div>
+              </div>
+            </div>
+          `
+        });
+      });
+    });
+
+    // 4. Fullscreen Lightbox Modal for Interior Gallery
+    let lightbox = document.getElementById('hallLightbox');
+    if (!lightbox) {
+      lightbox = document.createElement('div');
+      lightbox.id = 'hallLightbox';
+      lightbox.className = 'lightbox-modal';
+      lightbox.innerHTML = `
+        <div class="lightbox-content">
+          <button class="lightbox-close" id="lightboxCloseBtn" aria-label="Close">&times;</button>
+          <img class="lightbox-image" src="" alt="Gallery Image">
+          <div class="lightbox-caption"></div>
+        </div>
+      `;
+      document.body.appendChild(lightbox);
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.id === 'lightboxCloseBtn') {
+          lightbox.classList.remove('is-active');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('is-active')) {
+          lightbox.classList.remove('is-active');
+        }
+      });
+    }
+
+    document.querySelectorAll('.gallery-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        const img = tile.querySelector('img');
+        const title = tile.querySelector('.gallery-tile__title');
+        if (img && lightbox) {
+          lightbox.querySelector('.lightbox-image').src = img.src;
+          lightbox.querySelector('.lightbox-caption').textContent = title ? title.textContent : '';
+          lightbox.classList.add('is-active');
+        }
+      });
+    });
+
+    // 5. Copy Address Button
+    document.querySelectorAll('.btn-copy-address').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const addr = '1995 Springbrook Square Dr #107, Naperville, IL 60564';
+        navigator.clipboard.writeText(addr).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = isEn ? '✓ Copied!' : '✓ Скопировано!';
+          btn.style.background = 'var(--gold)';
+          btn.style.color = 'var(--night-3)';
+          setTimeout(() => {
+            btn.textContent = orig;
+            btn.style.background = '';
+            btn.style.color = '';
+          }, 2000);
+        });
+      });
+    });
+  }
 
   // Generic Modal Helper
   function showModal({ title, message, icon = '✨' }) {

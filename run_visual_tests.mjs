@@ -53,7 +53,7 @@ async function waitForServer(port, maxTries = 20) {
 
   for (const vp of viewports) {
     const outFile = path.join(screenshotDir, `screenshot_${vp.name}.png`);
-    const cmd = `"${chromePath}" --headless --disable-gpu --window-size=${vp.width},${vp.height} --screenshot="${outFile}" http://localhost:4173/ru/`;
+    const cmd = `"${chromePath}" --headless --disable-gpu --virtual-time-budget=2500 --window-size=${vp.width},${vp.height} --screenshot="${outFile}" http://localhost:4173/ru/`;
     try {
       console.log(`Testing viewport ${vp.width}x${vp.height} (${vp.name})...`);
       execSync(cmd, { stdio: 'ignore', timeout: 15000 });
@@ -87,7 +87,7 @@ async function waitForServer(port, maxTries = 20) {
   for (const sp of subpages) {
     const cleanName = sp.replace(/\//g, '_');
     const outFile = path.join(screenshotDir, `subpage${cleanName}.png`);
-    const cmd = `"${chromePath}" --headless --disable-gpu --window-size=1440,900 --screenshot="${outFile}" http://localhost:4173${sp}`;
+    const cmd = `"${chromePath}" --headless --disable-gpu --virtual-time-budget=2500 --window-size=1440,900 --screenshot="${outFile}" http://localhost:4173${sp}`;
     try {
       console.log(`Testing route ${sp}...`);
       execSync(cmd, { stdio: 'ignore', timeout: 15000 });

@@ -297,10 +297,26 @@
   gsap.fromTo('[data-fire]', { xPercent: 0 }, { xPercent: -34, ease: 'none', scrollTrigger: { trigger: '.fire', start: 'top bottom', end: 'bottom top', scrub: true } });
 
   /* ---------- Headings rise once, nothing else fades ---------- */
-  document.querySelectorAll('.chef h2, .hall h2, .visit h2, .menu__head h2').forEach(function (h) {
-    gsap.from(h, { y: 40, autoAlpha: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: h, start: 'top 88%', once: true } });
+  document.querySelectorAll('.chef h2, .hall h2, .visit h2, .menu__head h2, .plov h2').forEach(function (h) {
+    gsap.from(h, { y: 35, autoAlpha: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: h, start: 'top 88%', once: true } });
   });
   gsap.from('.chef__kazan', { scale: 0.6, rotation: -40, autoAlpha: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '.chef__media', start: 'top 70%', once: true } });
+
+  /* ---------- Footer entrance reveal ---------- */
+  var footerEl = document.querySelector('.ftr, .site-footer');
+  if (footerEl) {
+    var cols = footerEl.querySelectorAll('.ftr-col, .ftr__col, .ftr-bottom, .ftr__bottom');
+    if (cols.length) {
+      gsap.from(cols, {
+        y: 25,
+        autoAlpha: 0,
+        duration: 0.75,
+        stagger: 0.1,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: footerEl, start: 'top 92%', once: true }
+      });
+    }
+  }
 
   window.addEventListener('load', function () { ST.refresh(); });
 })();

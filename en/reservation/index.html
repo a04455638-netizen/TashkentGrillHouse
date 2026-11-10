@@ -121,39 +121,209 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Select Table / Seating Area</label>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <label class="form-label" style="margin-bottom:0;">Select Table / Seating Area</label>
+              <span style="font-size:12px; color:var(--cream-dim);">Click image for detailed preview</span>
+            </div>
             <div class="table-grid">
-              <div class="table-slot-card" data-table="T-01">
-                <div class="t-num">T-01</div>
-                <div class="t-cap">Window (1-2)</div>
+              <!-- Table T-01 -->
+              <div class="table-slot-card" data-table="T-01"
+                   data-title="Table T-01 — Panoramic Window Table"
+                   data-cap="👥 1–2 Guests"
+                   data-zone="📍 Panoramic Window"
+                   data-desc="Intimate dining table for two by the expansive window with gentle natural daylight. Ideal for romantic dinners or quiet conversations."
+                   data-img="/img/tables/table-t01.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t01.jpg" alt="Table T-01 — Panoramic Window" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-01" aria-label="Preview Table T-01">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-01</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 1–2 Guests • Window</div>
+                  <div class="t-desc">Intimate table for two by the panoramic window with soft daylight.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-01">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-02">
-                <div class="t-num">T-02</div>
-                <div class="t-cap">Window (1-2)</div>
+
+              <!-- Table T-02 -->
+              <div class="table-slot-card" data-table="T-02"
+                   data-title="Table T-02 — Sunset Window Table"
+                   data-cap="👥 1–2 Guests"
+                   data-zone="📍 Panoramic Window"
+                   data-desc="Window table bathed in warm evening sunset light with expansive views. Romantic ambiance framed in soft golden glow."
+                   data-img="/img/tables/table-t02.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t02.jpg" alt="Table T-02 — Sunset Window" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-02" aria-label="Preview Table T-02">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-02</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 1–2 Guests • Window</div>
+                  <div class="t-desc">Warm sunset glow, panoramic views, and intimate romantic setting.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-02">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-03">
-                <div class="t-num">T-03</div>
-                <div class="t-cap">Velvet Booth (2-4)</div>
+
+              <!-- Table T-03 -->
+              <div class="table-slot-card" data-table="T-03"
+                   data-title="Table T-03 — Cobalt Velvet Booth"
+                   data-cap="👥 2–4 Guests"
+                   data-zone="📍 Main Hall • Velvet Booth"
+                   data-desc="Plush semicircular booth in deep cobalt blue velvet nestled beside a hand-carved oriental archway. Seamless blend of seclusion and dining room energy."
+                   data-img="/img/tables/table-t03.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t03.jpg" alt="Table T-03 — Cobalt Booth" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-03" aria-label="Preview Table T-03">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-03</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Guests • Velvet Booth</div>
+                  <div class="t-desc">Deep cobalt velvet booth beside a carved oriental archway.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-03">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card selected" data-table="T-04">
-                <div class="t-num">T-04</div>
-                <div class="t-cap">Velvet Booth (2-4)</div>
+
+              <!-- Table T-04 -->
+              <div class="table-slot-card selected" data-table="T-04"
+                   data-title="Table T-04 — Central Velvet Booth"
+                   data-cap="👥 2–4 Guests"
+                   data-zone="📍 Hall Center • Premium Booth"
+                   data-desc="Prime central dining booth with rich cobalt seating, warm amber pendant light, and excellent vantage over the open grill and tandoor oven."
+                   data-img="/img/tables/table-t04.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t04.jpg" alt="Table T-04 — Central Booth" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-04" aria-label="Preview Table T-04">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-04</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Guests • Velvet Booth</div>
+                  <div class="t-desc">Rich cobalt seating and warm amber lighting in hall center.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-04">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-05">
-                <div class="t-num">T-05</div>
-                <div class="t-cap">Central Walnut (2-4)</div>
+
+              <!-- Table T-05 -->
+              <div class="table-slot-card" data-table="T-05"
+                   data-title="Table T-05 — Handcrafted Walnut Table"
+                   data-cap="👥 2–4 Guests"
+                   data-zone="📍 Main Dining Hall • Walnut"
+                   data-desc="Solid natural walnut dining table handcrafted with brass accents. Surrounded by intricate Uzbek geometric patterns and warm lighting."
+                   data-img="/img/tables/table-t05.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t05.jpg" alt="Table T-05 — Walnut Table" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-05" aria-label="Preview Table T-05">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-05</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Guests • Central Walnut</div>
+                  <div class="t-desc">Handcrafted walnut table surrounded by authentic brass patterns.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-05">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-06">
-                <div class="t-num">T-06</div>
-                <div class="t-cap">Family Table (4-6)</div>
+
+              <!-- Table T-06 -->
+              <div class="table-slot-card" data-table="T-06"
+                   data-title="Table T-06 — Family Feast Table"
+                   data-cap="👥 4–6 Guests"
+                   data-zone="📍 Family Dining Area"
+                   data-desc="Spacious family table tailored for traditional Uzbek feasting, tea service with painted porcelain sets, and communal dining."
+                   data-img="/img/tables/table-t06.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t06.jpg" alt="Table T-06 — Family Table" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-06" aria-label="Preview Table T-06">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-06</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 4–6 Guests • Family Table</div>
+                  <div class="t-desc">Expansive table for family celebrations and tea ceremonies.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-06">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-07">
-                <div class="t-num">T-07</div>
-                <div class="t-cap">Family Table (4-6)</div>
+
+              <!-- Table T-07 -->
+              <div class="table-slot-card" data-table="T-07"
+                   data-title="Table T-07 — Suzani Gallery Table"
+                   data-cap="👥 4–6 Guests"
+                   data-zone="📍 Suzani Art Gallery"
+                   data-desc="Large dining table framed by an authentic hand-embroidered Uzbek Suzani silk tapestry. Evokes the heritage of Samarkand craftsmanship."
+                   data-img="/img/tables/table-t07.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t07.jpg" alt="Table T-07 — Suzani Gallery" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-07" aria-label="Preview Table T-07">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-07</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 4–6 Guests • Suzani Gallery</div>
+                  <div class="t-desc">Festive table framed by authentic silk Suzani tapestry.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-07">Select Table</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-08">
-                <div class="t-num">T-08</div>
-                <div class="t-cap">Lagan Lounge (6-10)</div>
+
+              <!-- Table T-08 -->
+              <div class="table-slot-card" data-table="T-08"
+                   data-title="Table T-08 — VIP Private Feast Lounge"
+                   data-cap="👥 6–10 Guests"
+                   data-zone="📍 VIP Private Lounge"
+                   data-desc="Secluded private VIP banquet lounge for milestones and corporate gatherings. Features grand ceremonial lagan platter presentations."
+                   data-img="/img/tables/table-t08.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t08.jpg" alt="Table T-08 — VIP Lounge" loading="lazy">
+                  <span class="table-render-badge">Illustrative Render</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-08" aria-label="Preview Table T-08">🔍 Preview</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-08</span>
+                    <span class="table-status-pill">Available</span>
+                  </div>
+                  <div class="t-cap">👥 6–10 Guests • VIP Lounge</div>
+                  <div class="t-desc">Secluded VIP private lounge for grand celebratory feasts.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-08">Select Table</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -251,6 +421,30 @@
   </div>
 </footer>
   
+  <!-- Interactive Table Image Preview Modal (Phase 3) -->
+  <div id="tablePreviewModal" class="table-preview-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTableTitle">
+    <div class="table-preview-modal-card">
+      <button type="button" class="table-modal-close-btn" aria-label="Close modal">×</button>
+      <div class="table-modal-img-wrap">
+        <img id="modalTableImg" src="" alt="Table photo">
+        <span class="table-render-badge">Illustrative Render</span>
+      </div>
+      <div class="table-modal-info">
+        <div class="table-modal-header">
+          <h3 id="modalTableTitle" class="table-modal-title">Table</h3>
+          <span id="modalTableStatus" class="table-status-pill">Available</span>
+        </div>
+        <div class="table-modal-meta">
+          <span id="modalTableCap">👥 1–2 Guests</span>
+          <span id="modalTableZone">📍 Panoramic Window</span>
+        </div>
+        <p id="modalTableDesc" class="table-modal-desc"></p>
+        <div class="table-modal-actions">
+          <button type="button" id="modalSelectBtn" class="table-modal-select-btn">Select This Table</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="/assets/app.js"></script>
 </body>

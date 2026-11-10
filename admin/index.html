@@ -590,6 +590,20 @@
             <input type="text" id="tabFormDesc" class="adm-input" placeholder="e.g. Plush velvet booth near central fountain">
           </div>
 
+          <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:14px;">
+            <div class="adm-form-group">
+              <label class="adm-form-label" for="tabFormImageUrl">Image URL</label>
+              <input type="text" id="tabFormImageUrl" class="adm-input" placeholder="e.g. /img/tables/table-t01.jpg">
+            </div>
+            <div class="adm-form-group">
+              <label class="adm-form-label" for="tabFormImageType">Image Type</label>
+              <select id="tabFormImageType" class="adm-select">
+                <option value="illustration">Conceptual Render</option>
+                <option value="photo">Actual Photo</option>
+              </select>
+            </div>
+          </div>
+
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
             <input type="checkbox" id="tabFormActive" checked>
             <span style="font-size:13px;">Active and available for online booking</span>

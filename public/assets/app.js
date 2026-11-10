@@ -712,13 +712,25 @@
           const tabNum = card.dataset.table;
           const tData = tables.find(t => t.table_number === tabNum);
           const capEl = card.querySelector('.t-cap');
+          const statusPill = card.querySelector('.table-status-pill');
+          const selBtn = card.querySelector('.btn-select-table');
 
           if (!tData || !tData.is_available) {
             card.classList.add('unavailable');
-            card.style.pointerEvents = 'none';
             card.setAttribute('aria-disabled', 'true');
 
-            if (capEl) {
+            if (statusPill) {
+              if (tData?.unavailable_reason === 'reserved') {
+                statusPill.textContent = isEn ? 'Reserved' : 'Занят';
+                statusPill.className = 'table-status-pill status-busy';
+              } else if (tData?.unavailable_reason === 'capacity_exceeded') {
+                statusPill.textContent = isEn ? 'Too Small' : 'Мало мест';
+                statusPill.className = 'table-status-pill status-small';
+              } else {
+                statusPill.textContent = isEn ? 'Unavailable' : 'Недоступен';
+                statusPill.className = 'table-status-pill status-busy';
+              }
+            } else if (capEl) {
               if (tData?.unavailable_reason === 'reserved') {
                 capEl.textContent = isEn ? 'Reserved' : 'Занят';
                 capEl.style.color = '#ef4444';
@@ -731,17 +743,29 @@
               }
             }
 
+            if (selBtn) {
+              selBtn.disabled = true;
+              selBtn.textContent = isEn ? 'Unavailable' : 'Недоступен';
+            }
+
             if (selectedTable === tabNum) {
               card.classList.remove('selected');
               selectedTable = null;
             }
           } else {
             card.classList.remove('unavailable');
-            card.style.pointerEvents = 'auto';
             card.removeAttribute('aria-disabled');
+            if (statusPill) {
+              statusPill.textContent = isEn ? 'Available' : 'Доступен';
+              statusPill.className = 'table-status-pill';
+            }
             if (capEl) {
               capEl.textContent = originalCaptions[tabNum] || (isEn ? `Max ${tData.capacity_max}` : `До ${tData.capacity_max} мест`);
               capEl.style.color = '';
+            }
+            if (selBtn) {
+              selBtn.disabled = false;
+              selBtn.textContent = isEn ? 'Select Table' : 'Выбрать стол';
             }
           }
         });
@@ -754,18 +778,131 @@
             selectedTable = firstAvail.dataset.table;
           }
         }
+        updateCardSelectionStates();
       } catch (err) {
         console.warn('[Table availability check notice]:', err.message);
       }
     }
 
+    function updateCardSelectionStates() {
+      tableCards.forEach(c => {
+        const isSel = (c.dataset.table === selectedTable);
+        c.classList.toggle('selected', isSel);
+        const selBtn = c.querySelector('.btn-select-table');
+        if (selBtn && !c.classList.contains('unavailable')) {
+          selBtn.textContent = isSel ? (isEn ? 'Selected ✓' : 'Выбран ✓') : (isEn ? 'Select Table' : 'Выбрать стол');
+        }
+      });
+    }
+
+    // Modal Preview Wiring
+    const previewModal = document.getElementById('tablePreviewModal');
+    if (previewModal) {
+      const modalImg = document.getElementById('modalTableImg');
+      const modalTitle = document.getElementById('modalTableTitle');
+      const modalStatus = document.getElementById('modalTableStatus');
+      const modalCap = document.getElementById('modalTableCap');
+      const modalZone = document.getElementById('modalTableZone');
+      const modalDesc = document.getElementById('modalTableDesc');
+      const modalSelectBtn = document.getElementById('modalSelectBtn');
+      const modalCloseBtn = previewModal.querySelector('.table-modal-close-btn');
+
+      let activeModalTable = null;
+
+      function openTableModal(tabId) {
+        const card = document.querySelector(`.table-slot-card[data-table="${tabId}"]`);
+        if (!card) return;
+        activeModalTable = tabId;
+
+        if (modalImg) {
+          modalImg.src = card.dataset.img || `/img/tables/table-${tabId.toLowerCase()}.jpg`;
+          modalImg.alt = card.dataset.title || `Table ${tabId}`;
+        }
+        if (modalTitle) modalTitle.textContent = card.dataset.title || `Table ${tabId}`;
+        if (modalCap) modalCap.textContent = card.dataset.cap || '';
+        if (modalZone) modalZone.textContent = card.dataset.zone || '';
+        if (modalDesc) modalDesc.textContent = card.dataset.desc || '';
+
+        const isAvail = !card.classList.contains('unavailable');
+        if (modalStatus) {
+          modalStatus.textContent = isAvail ? (isEn ? 'Available' : 'Доступен') : (isEn ? 'Unavailable' : 'Недоступен');
+          modalStatus.className = isAvail ? 'table-status-pill' : 'table-status-pill status-busy';
+        }
+        if (modalSelectBtn) {
+          modalSelectBtn.disabled = !isAvail;
+          modalSelectBtn.textContent = isAvail
+            ? (selectedTable === tabId ? (isEn ? 'Table Selected ✓' : 'Стол выбран ✓') : (isEn ? 'Select This Table' : 'Выбрать этот стол'))
+            : (isEn ? 'Unavailable' : 'Недоступен');
+        }
+
+        previewModal.classList.add('is-open');
+        previewModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTableModal() {
+        previewModal.classList.remove('is-open');
+        previewModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeTableModal);
+      previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) closeTableModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && previewModal.classList.contains('is-open')) closeTableModal();
+      });
+
+      if (modalSelectBtn) {
+        modalSelectBtn.addEventListener('click', () => {
+          if (activeModalTable) {
+            const card = document.querySelector(`.table-slot-card[data-table="${activeModalTable}"]`);
+            if (card && !card.classList.contains('unavailable')) {
+              selectedTable = activeModalTable;
+              updateCardSelectionStates();
+              closeTableModal();
+              card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+        });
+      }
+
+      // Hook preview buttons
+      document.querySelectorAll('[data-preview-table]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openTableModal(btn.dataset.previewTable);
+        });
+      });
+
+      tableCards.forEach(card => {
+        const thumb = card.querySelector('.table-card-thumb-wrap');
+        if (thumb) {
+          thumb.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openTableModal(card.dataset.table);
+          });
+        }
+      });
+    }
+
     tableCards.forEach(card => {
       card.addEventListener('click', () => {
         if (card.classList.contains('unavailable')) return;
-        tableCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
         selectedTable = card.dataset.table;
+        updateCardSelectionStates();
       });
+
+      const selBtn = card.querySelector('.btn-select-table');
+      if (selBtn) {
+        selBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (card.classList.contains('unavailable')) return;
+          selectedTable = card.dataset.table;
+          updateCardSelectionStates();
+        });
+      }
     });
 
     if (form.resDate) form.resDate.addEventListener('change', checkAvailability);

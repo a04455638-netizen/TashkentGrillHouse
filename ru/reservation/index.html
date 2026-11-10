@@ -121,39 +121,209 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Выберите стол или зону</label>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+              <label class="form-label" style="margin-bottom:0;">Выберите стол или зону зала</label>
+              <span style="font-size:12px; color:var(--cream-dim);">Нажмите на фото для детального обзора</span>
+            </div>
             <div class="table-grid">
-              <div class="table-slot-card" data-table="T-01">
-                <div class="t-num">T-01</div>
-                <div class="t-cap">У окна (1-2)</div>
+              <!-- Table T-01 -->
+              <div class="table-slot-card" data-table="T-01"
+                   data-title="Стол T-01 — Зона у окна"
+                   data-cap="👥 1–2 Гостя"
+                   data-zone="📍 У панорамного окна"
+                   data-desc="Уютный столик для двоих у панорамного окна с мягким естественным светом. Идеален для романтического ужина или неспешной деловой беседы."
+                   data-img="/img/tables/table-t01.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t01.jpg" alt="Стол T-01 — У окна" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-01" aria-label="Детальный обзор стола T-01">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-01</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 1–2 Гостя • У окна</div>
+                  <div class="t-desc">Уютный столик для двоих у панорамного окна с мягким дневным светом.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-01">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-02">
-                <div class="t-num">T-02</div>
-                <div class="t-cap">У окна (1-2)</div>
+
+              <!-- Table T-02 -->
+              <div class="table-slot-card" data-table="T-02"
+                   data-title="Стол T-02 — Зона у окна (Вечерний закат)"
+                   data-cap="👥 1–2 Гостя"
+                   data-zone="📍 У панорамного окна"
+                   data-desc="Столик у окна с теплым вечерним светом и панорамным видом. Романтическая уединенная атмосфера в мягких золотых тонах."
+                   data-img="/img/tables/table-t02.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t02.jpg" alt="Стол T-02 — Зона у окна" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-02" aria-label="Детальный обзор стола T-02">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-02</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 1–2 Гостя • У окна</div>
+                  <div class="t-desc">Теплый вечерний свет, панорамный вид и уединенная романтическая атмосфера.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-02">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-03">
-                <div class="t-num">T-03</div>
-                <div class="t-cap">Бархат (2-4)</div>
+
+              <!-- Table T-03 -->
+              <div class="table-slot-card" data-table="T-03"
+                   data-title="Стол T-03 — Бархатная ложа"
+                   data-cap="👥 2–4 Гостя"
+                   data-zone="📍 Главный зал • Бархатная зона"
+                   data-desc="Элегантная полукруглая ложа из глубокого кобальтового бархата рядом с резной восточной аркой. Идеальный баланс уединенности и атмосферы ресторана."
+                   data-img="/img/tables/table-t03.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t03.jpg" alt="Стол T-03 — Бархатная ложа" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-03" aria-label="Детальный обзор стола T-03">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-03</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Гостя • Бархат</div>
+                  <div class="t-desc">Глубокий кобальтовый бархат у резной восточной арки.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-03">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card selected" data-table="T-04">
-                <div class="t-num">T-04</div>
-                <div class="t-cap">Бархат (2-4)</div>
+
+              <!-- Table T-04 -->
+              <div class="table-slot-card selected" data-table="T-04"
+                   data-title="Стол T-04 — Центральная бархатная ложа"
+                   data-cap="👥 2–4 Гостя"
+                   data-zone="📍 Центр зала • Премиум ложа"
+                   data-desc="Центральная ложа с мягкими кобальтовыми диванами, теплым янтарным светильником и превосходным обзором на открытую кухню и тандыр."
+                   data-img="/img/tables/table-t04.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t04.jpg" alt="Стол T-04 — Центральная ложа" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-04" aria-label="Детальный обзор стола T-04">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-04</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Гостя • Бархат</div>
+                  <div class="t-desc">Мягкие кобальтовые диваны и янтарный свет в центре зала.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-04">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-05">
-                <div class="t-num">T-05</div>
-                <div class="t-cap">Орех центр (2-4)</div>
+
+              <!-- Table T-05 -->
+              <div class="table-slot-card" data-table="T-05"
+                   data-title="Стол T-05 — Ореховый стол ручной работы"
+                   data-cap="👥 2–4 Гостя"
+                   data-zone="📍 Главный зал • Ореховое дерево"
+                   data-desc="Массивный стол из натурального ореха ручной работы в центре зала. Окружен аутентичными узбекскими орнаментами и латунными деталями."
+                   data-img="/img/tables/table-t05.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t05.jpg" alt="Стол T-05 — Ореховый центр" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-05" aria-label="Детальный обзор стола T-05">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-05</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 2–4 Гостя • Орех центр</div>
+                  <div class="t-desc">Стол из натурального ореха в окружении восточных орнаментов.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-05">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-06">
-                <div class="t-num">T-06</div>
-                <div class="t-cap">Семейный (4-6)</div>
+
+              <!-- Table T-06 -->
+              <div class="table-slot-card" data-table="T-06"
+                   data-title="Стол T-06 — Семейный стол для застолий"
+                   data-cap="👥 4–6 Гостей"
+                   data-zone="📍 Семейная зона зала"
+                   data-desc="Просторный семейный стол для традиционного узбекского застолья, чаепития из расписных чайников и подачи праздничного плова."
+                   data-img="/img/tables/table-t06.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t06.jpg" alt="Стол T-06 — Семейный стол" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-06" aria-label="Детальный обзор стола T-06">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-06</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 4–6 Гостей • Семейный</div>
+                  <div class="t-desc">Большой стол для семейных праздников и традиционного чаепития.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-06">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-07">
-                <div class="t-num">T-07</div>
-                <div class="t-cap">Семейный (4-6)</div>
+
+              <!-- Table T-07 -->
+              <div class="table-slot-card" data-table="T-07"
+                   data-title="Стол T-07 — Зал Сюзане"
+                   data-cap="👥 4–6 Гостей"
+                   data-zone="📍 Галерея Сюзане"
+                   data-desc="Большой праздничный стол рядом с подлинным шелковым настенным полотном Сюзане. Изысканная историческая атмосфера Самарканда."
+                   data-img="/img/tables/table-t07.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t07.jpg" alt="Стол T-07 — Зал Сюзане" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-07" aria-label="Детальный обзор стола T-07">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-07</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 4–6 Гостей • Зал Сюзане</div>
+                  <div class="t-desc">Уютный праздничный стол у традиционного шелкового ковра Сюзане.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-07">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
-              <div class="table-slot-card" data-table="T-08">
-                <div class="t-num">T-08</div>
-                <div class="t-cap">VIP Лаунж (6-10)</div>
+
+              <!-- Table T-08 -->
+              <div class="table-slot-card" data-table="T-08"
+                   data-title="Стол T-08 — VIP Лаунж Застолий"
+                   data-cap="👥 6–10 Гостей"
+                   data-zone="📍 VIP Приватная Зона"
+                   data-desc="Приватный VIP-лаунж для особых торжеств и закрытых ужинов. Роскошная подача на больших блюдах-лаганах в уединенной приватной атмосфере."
+                   data-img="/img/tables/table-t08.jpg">
+                <div class="table-card-thumb-wrap">
+                  <img src="/img/tables/table-t08.jpg" alt="Стол T-08 — VIP Лаунж" loading="lazy">
+                  <span class="table-render-badge">Концепт-рендер</span>
+                  <button type="button" class="table-preview-btn-overlay" data-preview-table="T-08" aria-label="Детальный обзор стола T-08">🔍 Обзор</button>
+                </div>
+                <div class="table-card-content">
+                  <div class="table-card-top">
+                    <span class="t-num">T-08</span>
+                    <span class="table-status-pill">Доступен</span>
+                  </div>
+                  <div class="t-cap">👥 6–10 Гостей • VIP Лаунж</div>
+                  <div class="t-desc">Приватный VIP-лаунж для масштабных торжеств и блюд-лаганов.</div>
+                  <div class="table-card-footer">
+                    <button type="button" class="btn-select-table" data-action-select="T-08">Выбрать стол</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -251,6 +421,30 @@
   </div>
 </footer>
   
+  <!-- Interactive Table Image Preview Modal (Phase 3) -->
+  <div id="tablePreviewModal" class="table-preview-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTableTitle">
+    <div class="table-preview-modal-card">
+      <button type="button" class="table-modal-close-btn" aria-label="Закрыть окно">×</button>
+      <div class="table-modal-img-wrap">
+        <img id="modalTableImg" src="" alt="Фото стола">
+        <span class="table-render-badge">Концепт-рендер интерьера</span>
+      </div>
+      <div class="table-modal-info">
+        <div class="table-modal-header">
+          <h3 id="modalTableTitle" class="table-modal-title">Стол</h3>
+          <span id="modalTableStatus" class="table-status-pill">Доступен</span>
+        </div>
+        <div class="table-modal-meta">
+          <span id="modalTableCap">👥 1–2 Гостя</span>
+          <span id="modalTableZone">📍 Зона у окна</span>
+        </div>
+        <p id="modalTableDesc" class="table-modal-desc"></p>
+        <div class="table-modal-actions">
+          <button type="button" id="modalSelectBtn" class="table-modal-select-btn">Выбрать этот стол</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="/assets/app.js"></script>
 </body>

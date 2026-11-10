@@ -730,25 +730,33 @@
       return;
     }
 
-    grid.innerHTML = items.map(t => `
-      <div class="adm-card" style="margin:0;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="margin:0; font-size:22px; color:var(--admin-gold-light); font-weight:bold;">${escapeHtml(t.table_number)}</h3>
+    grid.innerHTML = items.map(t => {
+      const imgUrl = t.image_url || `/img/tables/table-${(t.table_number || '').toLowerCase()}.jpg`;
+      return `
+      <div class="adm-card" style="margin:0; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="position:relative; width:100%; aspect-ratio:16/9; background:#111; overflow:hidden; border-radius:6px; margin-bottom:12px;">
+          <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(t.table_number)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
+          <span style="position:absolute; top:6px; left:6px; background:rgba(0,0,0,0.75); color:var(--admin-gold-light); font-size:10px; padding:2px 8px; border-radius:3px; text-transform:uppercase; font-weight:bold; letter-spacing:0.04em;">
+            ${escapeHtml(t.image_type || 'illustration')}
+          </span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 style="margin:0; font-size:20px; color:var(--admin-gold-light); font-weight:bold;">${escapeHtml(t.table_number)}</h3>
           <span class="adm-badge ${t.is_active ? 'badge-ready' : 'badge-cancelled'}">${t.is_active ? 'Active' : 'Disabled'}</span>
         </div>
-        <div style="font-size:13px; color:var(--admin-muted); margin-bottom:14px;">
+        <div style="font-size:13px; color:var(--admin-muted); margin-bottom:14px; flex:1;">
           <div><strong>Capacity:</strong> ${t.capacity_min} – ${t.capacity_max} guests</div>
           <div><strong>Zone:</strong> <span style="text-transform:capitalize;">${(t.zone || '').replace('_', ' ')}</span></div>
-          ${t.description ? `<div style="margin-top:4px;">${escapeHtml(t.description)}</div>` : ''}
+          ${t.description ? `<div style="margin-top:6px; font-style:italic; line-height:1.4;">${escapeHtml(t.description)}</div>` : ''}
         </div>
-        <div style="display:flex; gap:8px; padding-top:12px; border-top:1px solid var(--admin-border);">
+        <div style="display:flex; gap:8px; padding-top:12px; border-top:1px solid var(--admin-border); margin-top:auto;">
           <button class="adm-btn adm-btn-secondary adm-btn-sm" style="flex:1;" onclick="window.tghAdmin.toggleTableActive('${t.id}', ${!t.is_active})">
             ${t.is_active ? 'Disable' : 'Activate'}
           </button>
           <button class="adm-btn adm-btn-danger adm-btn-sm" onclick="window.tghAdmin.deleteTable('${t.id}')">🗑</button>
         </div>
       </div>
-    `).join('');
+    `}).join('');
   }
 
   function openAddTableModal() {
@@ -764,6 +772,8 @@
       capacity_max: parseInt(document.getElementById('tabFormMax').value) || 4,
       zone: document.getElementById('tabFormZone').value,
       description: document.getElementById('tabFormDesc').value.trim(),
+      image_url: (document.getElementById('tabFormImageUrl')?.value || '').trim() || null,
+      image_type: document.getElementById('tabFormImageType')?.value || 'illustration',
       is_active: document.getElementById('tabFormActive').checked
     };
 

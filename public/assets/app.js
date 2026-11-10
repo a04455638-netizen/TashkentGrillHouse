@@ -9,6 +9,20 @@
  */
 
 (function () {
+  // Helper to transparently dispatch to /api/ on Vercel or /.netlify/functions/ on Netlify
+  async function callServerless(fnName, options) {
+    const clean = fnName.replace(/^\/(\.netlify\/functions|api)\//, '');
+    try {
+      let res = await fetch(`/api/${clean}`, options);
+      if (res.status === 404) {
+        res = await fetch(`/.netlify/functions/${clean}`, options);
+      }
+      return res;
+    } catch (e) {
+      return await fetch(`/.netlify/functions/${clean}`, options);
+    }
+  }
+
   // 1. Extended Authoritative Menu Dataset with Nutrition & Pairings
   const MENU_DATA = [
     {
@@ -648,23 +662,134 @@
     btnEl.classList.toggle('active', isNowFav);
   };
 
-  // 8. Reservation Page Controller
+  // 8. Reservation Page Controller (Dynamic Database-Backed Availability)
   function initReservationPage(isEn) {
     const form = document.getElementById('reservationForm');
+    if (!form) return;
     const tableCards = document.querySelectorAll('.table-slot-card');
-    let selectedTable = 'T-04';
+    let selectedTable = null;
+
+    // Store original labels for each table card
+    const originalCaptions = {};
+    tableCards.forEach(card => {
+      const capEl = card.querySelector('.t-cap');
+      originalCaptions[card.dataset.table] = capEl ? capEl.textContent : '';
+    });
+
+    // Determine Chicago today date string (YYYY-MM-DD)
+    const chicagoToday = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Chicago',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(new Date());
+
+    if (form.resDate) {
+      form.resDate.min = chicagoToday;
+      if (!form.resDate.value) {
+        form.resDate.value = chicagoToday;
+      }
+    }
+    if (form.resTime && !form.resTime.value) {
+      form.resTime.value = '19:00';
+    }
+
+    // Dynamic Availability Checker
+    async function checkAvailability() {
+      const date = form.resDate ? form.resDate.value : '';
+      const time = form.resTime ? form.resTime.value : '';
+      const guests = form.resGuests ? form.resGuests.value : '2';
+
+      if (!date || !time) return;
+
+      try {
+        const res = await callServerless(`table-availability?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&guests=${encodeURIComponent(guests)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const tables = data.tables || [];
+
+        tableCards.forEach(card => {
+          const tabNum = card.dataset.table;
+          const tData = tables.find(t => t.table_number === tabNum);
+          const capEl = card.querySelector('.t-cap');
+
+          if (!tData || !tData.is_available) {
+            card.classList.add('unavailable');
+            card.style.pointerEvents = 'none';
+            card.setAttribute('aria-disabled', 'true');
+
+            if (capEl) {
+              if (tData?.unavailable_reason === 'reserved') {
+                capEl.textContent = isEn ? 'Reserved' : 'Занят';
+                capEl.style.color = '#ef4444';
+              } else if (tData?.unavailable_reason === 'capacity_exceeded') {
+                capEl.textContent = isEn ? 'Too Small' : 'Мало мест';
+                capEl.style.color = '#f59e0b';
+              } else {
+                capEl.textContent = isEn ? 'Unavailable' : 'Недоступен';
+                capEl.style.color = '#94a3b8';
+              }
+            }
+
+            if (selectedTable === tabNum) {
+              card.classList.remove('selected');
+              selectedTable = null;
+            }
+          } else {
+            card.classList.remove('unavailable');
+            card.style.pointerEvents = 'auto';
+            card.removeAttribute('aria-disabled');
+            if (capEl) {
+              capEl.textContent = originalCaptions[tabNum] || (isEn ? `Max ${tData.capacity_max}` : `До ${tData.capacity_max} мест`);
+              capEl.style.color = '';
+            }
+          }
+        });
+
+        // Auto-select first available table if current selection is invalid
+        if (!selectedTable) {
+          const firstAvail = Array.from(tableCards).find(c => !c.classList.contains('unavailable'));
+          if (firstAvail) {
+            firstAvail.classList.add('selected');
+            selectedTable = firstAvail.dataset.table;
+          }
+        }
+      } catch (err) {
+        console.warn('[Table availability check notice]:', err.message);
+      }
+    }
 
     tableCards.forEach(card => {
       card.addEventListener('click', () => {
+        if (card.classList.contains('unavailable')) return;
         tableCards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedTable = card.dataset.table;
       });
     });
 
+    if (form.resDate) form.resDate.addEventListener('change', checkAvailability);
+    if (form.resTime) form.resTime.addEventListener('change', checkAvailability);
+    if (form.resGuests) form.resGuests.addEventListener('change', checkAvailability);
+
+    // Initial availability check
+    checkAvailability();
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = form.querySelector('button[type="submit"]');
+
+      if (!selectedTable) {
+        showModal({
+          title: isEn ? 'No Table Selected' : 'Стол не выбран',
+          message: isEn
+            ? 'All tables appear unavailable for this time or guest count. Please select a different time or date.'
+            : 'Все столы на это время или количество гостей заняты. Пожалуйста, выберите другое время или дату.',
+          icon: '⚠️'
+        });
+        return;
+      }
+
       submitBtn.disabled = true;
       submitBtn.textContent = isEn ? 'Verifying table availability...' : 'Проверка стола...';
 
@@ -676,11 +801,11 @@
         name: form.resName.value,
         email: form.resEmail.value,
         phone: form.resPhone.value,
-        special_requests: form.resRequests.value
+        special_requests: form.resRequests ? form.resRequests.value : ''
       };
 
       try {
-        const res = await fetch('/.netlify/functions/create-reservation', {
+        const res = await callServerless('create-reservation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -695,28 +820,34 @@
               : 'Этот стол уже занят на выбранное время другим гостем. Пожалуйста, выберите другой стол или время.',
             icon: '⚠️'
           });
-        } else if (res.ok) {
+          checkAvailability();
+        } else if (res.ok && data.success) {
           showModal({
             title: isEn ? 'Reservation Confirmed!' : 'Бронь подтверждена!',
             message: (isEn
-              ? `Your table (${selectedTable}) has been reserved for ${payload.date} at ${payload.time}. Booking Code: `
-              : `Ваш стол (${selectedTable}) забронирован на ${payload.date} в ${payload.time}. Код брони: `) +
+              ? `Your table (${data.reservation?.table_number || selectedTable}) has been confirmed for ${payload.date} at ${payload.time}. Booking Code: `
+              : `Ваш стол (${data.reservation?.table_number || selectedTable}) успешно забронирован на ${payload.date} в ${payload.time}. Код брони: `) +
               `<b>${data.booking_code}</b>. Confirmation details sent to ${payload.email}.`,
             icon: '✨'
           });
           form.reset();
+          if (form.resDate) form.resDate.value = chicagoToday;
+          checkAvailability();
         } else {
           showModal({
             title: isEn ? 'Reservation Notice' : 'Уведомление о бронировании',
             message: data.error || (isEn ? 'Unable to complete booking.' : 'Не удалось забронировать стол.'),
-            icon: 'ℹ️'
+            icon: '⚠️'
           });
+          checkAvailability();
         }
       } catch (err) {
         showModal({
-          title: isEn ? 'Local Simulation Mode' : 'Режим тестирования',
-          message: (isEn ? 'Booking request received successfully (offline/local mode). Code: ' : 'Бронь принята. Код: ') + 'TGH-' + Math.random().toString(36).substring(2,8).toUpperCase(),
-          icon: '✅'
+          title: isEn ? 'Service Notice' : 'Ошибка соединения',
+          message: isEn
+            ? 'Reservation service is currently unavailable. Please call the restaurant directly at +1 (630) 000-0000.'
+            : 'Сервис бронирования временно недоступен. Пожалуйста, позвоните в ресторан напрямую по телефону +1 (630) 000-0000.',
+          icon: '⚠️'
         });
       } finally {
         submitBtn.disabled = false;
@@ -786,7 +917,7 @@
       };
 
       try {
-        const res = await fetch('/.netlify/functions/create-order', {
+        const res = await callServerless('create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -969,18 +1100,33 @@
   }
 
   window.cancelBooking = async function (code, isEn) {
-    if (!confirm(isEn ? `Are you sure you want to cancel booking ${code}?` : `Вы уверены, что хотите отменить бронь ${code}?`)) return;
+    const contact = prompt(
+      isEn
+        ? `To cancel reservation ${code}, please enter the phone number or email address used when booking:`
+        : `Чтобы отменить бронь ${code}, введите номер телефона или email, указанный при бронировании:`
+    );
+    if (!contact || !contact.trim()) return;
+
     try {
-      await fetch('/.netlify/functions/cancel-reservation', {
+      const res = await callServerless('cancel-reservation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ booking_code: code, reason: 'Customer requested cancellation' })
+        body: JSON.stringify({
+          booking_code: code,
+          customer_phone: contact.trim(),
+          customer_email: contact.trim(),
+          reason: 'Customer requested cancellation'
+        })
       });
-      alert(isEn ? 'Booking cancelled.' : 'Бронь отменена.');
-      location.reload();
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(isEn ? `Reservation ${code} has been cancelled and the table is released.` : `Бронь ${code} успешно отменена, стол освобождён.`);
+        location.reload();
+      } else {
+        alert(data.error || (isEn ? 'Cancellation failed.' : 'Не удалось отменить бронь.'));
+      }
     } catch (e) {
-      alert(isEn ? 'Cancelled in local mode.' : 'Бронь отменена в локальном режиме.');
-      location.reload();
+      alert(isEn ? 'Cancellation service unavailable. Please call the restaurant.' : 'Сервис отмены временно недоступен. Пожалуйста, позвоните в ресторан.');
     }
   };
 

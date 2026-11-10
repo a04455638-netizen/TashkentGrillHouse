@@ -1,13 +1,23 @@
+-- REVIEWED FOR INITIAL INSTALLATION ON AN EMPTY public SCHEMA.
+-- This script creates database structures and enables RLS; it does NOT configure Vercel functions.
+-- Restaurant contact details, hours, and example menu prices are unverified.
+-- All sample menu items and customer booking/order toggles remain disabled.
+-- Run only against the intended Supabase project after reviewing project and backups.
+BEGIN;
+
 -- ====================================================================
 -- TASHKENT GRILL HOUSE — PRODUCTION DATABASE SCHEMA MIGRATION 001
 -- PostgreSQL 15+ / Supabase
+-- Hardened, Concurrency-Safe, Non-Destructive, and Idempotent
 -- ====================================================================
 
 -- 1. Enable Required Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "btree_gist";
 
+-- ====================================================================
 -- 2. Restaurant Settings Table
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.restaurant_settings (
     key TEXT PRIMARY KEY,
     value JSONB NOT NULL,
@@ -15,16 +25,16 @@ CREATE TABLE IF NOT EXISTS public.restaurant_settings (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Seed initial restaurant configuration
+-- Seed initial restaurant configuration with clearly marked verification status
 INSERT INTO public.restaurant_settings (key, value, description) VALUES
 ('restaurant_info', '{
     "name": "Tashkent Grill House",
     "address": "1995 Springbrook Square Dr #107, Naperville, IL 60564",
-    "phone": "+1 (630) 000-0000",
-    "email": "info@tashkentgrillhouse.com",
+    "phone": "+1 (630) 000-0000 [PENDING_RESTAURANT_CONFIRMATION: Temporary reservation hotline]",
+    "email": "info@tashkentgrillhouse.com [PENDING_DOMAIN_SETUP]",
     "timezone": "America/Chicago",
     "instagram": "https://www.instagram.com/tashkentgrillhouse.chicago/"
-}', 'General contact information'),
+}', 'General contact information (verification pending official opening)'),
 ('business_status', '{
     "is_preopening": true,
     "bookings_enabled": false,
@@ -44,9 +54,14 @@ INSERT INTO public.restaurant_settings (key, value, description) VALUES
     "delivery_enabled": false,
     "min_pickup_time_minutes": 30,
     "tax_rate_percent": 8.75
-}', 'Online food ordering rules');
+}', 'Online food ordering rules')
+ON CONFLICT (key) DO UPDATE SET
+    description = EXCLUDED.description,
+    updated_at = now();
 
+-- ====================================================================
 -- 3. Opening Hours & Exceptions
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.opening_hours (
     id SERIAL PRIMARY KEY,
     day_of_week INT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6), -- 0=Sunday, 1=Monday...
@@ -76,7 +91,9 @@ CREATE TABLE IF NOT EXISTS public.availability_exceptions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ====================================================================
 -- 4. User Profiles Table (Linked to auth.users)
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
@@ -89,7 +106,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
 
+-- ====================================================================
 -- 5. Customer Addresses
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.customer_addresses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -106,7 +125,9 @@ CREATE TABLE IF NOT EXISTS public.customer_addresses (
 
 CREATE INDEX IF NOT EXISTS idx_cust_addr_user ON public.customer_addresses(user_id);
 
+-- ====================================================================
 -- 6. Menu Categories
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.menu_categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug TEXT UNIQUE NOT NULL,
@@ -128,7 +149,9 @@ INSERT INTO public.menu_categories (slug, name_ru, name_en, sort_order) VALUES
 ('drinks', 'Напитки и чай', 'Beverages & Tea', 60)
 ON CONFLICT (slug) DO NOTHING;
 
+-- ====================================================================
 -- 7. Menu Items & Secondary Images
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.menu_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category_id UUID NOT NULL REFERENCES public.menu_categories(id) ON DELETE RESTRICT,
@@ -164,7 +187,9 @@ CREATE TABLE IF NOT EXISTS public.menu_item_images (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Seed initial menu items matching the reference website
+-- Seed initial menu items matching the preview reference
+-- [NOTE: Sample prices are UNVERIFIED and all seeded items are kept unavailable until approved.]
+-- All INSERTs use is_available=false to prevent accepting purchases with sample prices.
 DO $$
 DECLARE
     plov_cat UUID;
@@ -177,41 +202,60 @@ BEGIN
     SELECT id INTO soups_cat FROM public.menu_categories WHERE slug = 'soups';
     SELECT id INTO bakery_cat FROM public.menu_categories WHERE slug = 'bakery';
 
-    INSERT INTO public.menu_items (category_id, slug, name_ru, name_en, description_ru, description_en, price, image_url, is_featured, sort_order)
-    VALUES
-    (plov_cat, 'tashkent-plov', 'Ташкентский плов', 'Tashkent Plov',
-     'Традиционный праздничный плов: длиннозёрный рис, нежная баранина и говядина, жёлтая и оранжевая морковь, нут, изюм, чеснок, перепелиные яйца и казы.',
-     'Signature festive Uzbek plov: long-grain rice, tender lamb and beef, yellow and orange carrots, chickpeas, raisins, garlic, quail eggs, and kazy.',
-     22.00, '/img/dishes/plov-1100.webp', true, 1),
+    IF plov_cat IS NOT NULL THEN
+        INSERT INTO public.menu_items (category_id, slug, name_ru, name_en, description_ru, description_en, price, image_url, is_featured, sort_order, is_available)
+        VALUES
+        (plov_cat, 'tashkent-plov', 'Ташкентский плов', 'Tashkent Plov',
+         'Традиционный праздничный плов: длиннозёрный рис, нежная баранина и говядина, жёлтая и оранжевая морковь, нут, изюм, чеснок, перепелиные яйца и казы.',
+         'Signature festive Uzbek plov: long-grain rice, tender lamb and beef, yellow and orange carrots, chickpeas, raisins, garlic, quail eggs, and kazy. [Preview estimate]',
+         22.00, '/img/dishes/plov-1100.webp', true, 1, false)
+        ON CONFLICT (slug) DO NOTHING;
+    END IF;
 
-    (soups_cat, 'lagman', 'Лагман по-уйгурски', 'Uighur Lagman',
-     'Тянутая вручную лапша, сочная говядина, сладкий перец, сельдерей, томаты и пряный наваристый соус Сай.',
-     'Hand-pulled fresh noodles with tender beef, bell peppers, celery, tomatoes, and aromatic spicy Sai gravy.',
-     18.50, '/img/dishes/lagman-1100.webp', true, 2),
+    IF soups_cat IS NOT NULL THEN
+        INSERT INTO public.menu_items (category_id, slug, name_ru, name_en, description_ru, description_en, price, image_url, is_featured, sort_order, is_available)
+        VALUES
+        (soups_cat, 'lagman', 'Лагман по-уйгурски', 'Uighur Lagman',
+         'Тянутая вручную лапша, сочная говядина, сладкий перец, сельдерей, томаты и пряный наваристый соус Сай.',
+         'Hand-pulled fresh noodles with tender beef, bell peppers, celery, tomatoes, and aromatic spicy Sai gravy. [Preview estimate]',
+         18.50, '/img/dishes/lagman-1100.webp', true, 2, false)
+        ON CONFLICT (slug) DO NOTHING;
+    END IF;
 
-    (grill_cat, 'shashlik-assorted', 'Шашлык на углях', 'Charcoal Shashlik',
-     'Мякоть баранины и сочная говядина, маринованные в горных травах и обжаренные на открытых берёзовых углях с маринованным луком.',
-     'Tender cuts of lamb and beef, marinated in mountain spices and charcoal-grilled over open coals, served with sumac-marinated onions.',
-     24.00, '/img/dishes/shashlik-1100.webp', true, 3),
+    IF grill_cat IS NOT NULL THEN
+        INSERT INTO public.menu_items (category_id, slug, name_ru, name_en, description_ru, description_en, price, image_url, is_featured, sort_order, is_available)
+        VALUES
+        (grill_cat, 'shashlik-assorted', 'Шашлык на углях', 'Charcoal Shashlik',
+         'Мякоть баранины и сочная говядина, маринованные в горных травах и обжаренные на открытых берёзовых углях с маринованным луком.',
+         'Tender cuts of lamb and beef, marinated in mountain spices and charcoal-grilled over open coals, served with sumac-marinated onions. [Preview estimate]',
+         24.00, '/img/dishes/shashlik-1100.webp', true, 3, false)
+        ON CONFLICT (slug) DO NOTHING;
+    END IF;
 
-    (bakery_cat, 'khachapuri-adjarian', 'Хачапури по-аджарски', 'Adjarian Khachapuri',
-     'Хрустящая лодочка из воздушного теста с сыром сулугуни, фермерским яичным желтком и кусочком сливочного масла.',
-     'Freshly baked canoe-shaped bread filled with melted suluguni cheese, organic egg yolk, and butter.',
-     16.00, '/img/dishes/khachapuri-1100.webp', true, 4),
+    IF bakery_cat IS NOT NULL THEN
+        INSERT INTO public.menu_items (category_id, slug, name_ru, name_en, description_ru, description_en, price, image_url, is_featured, sort_order, is_available)
+        VALUES
+        (bakery_cat, 'khachapuri-adjarian', 'Хачапури по-аджарски', 'Adjarian Khachapuri',
+         'Хрустящая лодочка из воздушного теста с сыром сулугуни, фермерским яичным желтком и кусочком сливочного масла.',
+         'Freshly baked canoe-shaped bread filled with melted suluguni cheese, organic egg yolk, and butter. [Preview estimate]',
+         16.00, '/img/dishes/khachapuri-1100.webp', true, 4, false),
 
-    (bakery_cat, 'samsa-tandyr', 'Самса тандырная', 'Tandyr Samsa',
-     'Слоёное хрустящее тесто, начинка из рублёной баранины и лука с кумином, выпекается на стенках раскалённого тандыра.',
-     'Crispy multi-layered pastry stuffed with hand-chopped spiced lamb, onions, and cumin, baked in traditional clay tandyr.',
-     6.50, '/img/dishes/samsa-1100.webp', true, 5),
+        (bakery_cat, 'samsa-tandyr', 'Самса тандырная', 'Tandyr Samsa',
+         'Слоёное хрустящее тесто, начинка из рублёной баранины и лука с кумином, выпекается на стенках раскалённого тандыра.',
+         'Crispy multi-layered pastry stuffed with hand-chopped spiced lamb, onions, and cumin, baked in traditional clay tandyr. [Preview estimate]',
+         6.50, '/img/dishes/samsa-1100.webp', true, 5, false),
 
-    (bakery_cat, 'uzbek-non', 'Узбекская лепёшка', 'Uzbek Tandyr Non',
-     'Пышный лепёшечный хлеб с узорчатым центром (чекич) и золотистой кунжутной корочкой, прямо из тандыра.',
-     'Traditional Uzbek round flatbread with stamped patterned center and golden sesame crust, baked fresh in the clay oven.',
-     4.50, '/img/dishes/non-1100.webp', true, 6)
-    ON CONFLICT (slug) DO NOTHING;
+        (bakery_cat, 'uzbek-non', 'Узбекская лепёшка', 'Uzbek Tandyr Non',
+         'Пышный лепёшечный хлеб с узорчатым центром (чекич) и золотистой кунжутной корочкой, прямо из тандыра.',
+         'Traditional Uzbek round flatbread with stamped patterned center and golden sesame crust, baked fresh in the clay oven. [Preview estimate]',
+         4.50, '/img/dishes/non-1100.webp', true, 6, false)
+        ON CONFLICT (slug) DO NOTHING;
+    END IF;
 END $$;
 
+-- ====================================================================
 -- 8. Restaurant Tables
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.restaurant_tables (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     table_number TEXT UNIQUE NOT NULL,
@@ -234,7 +278,9 @@ INSERT INTO public.restaurant_tables (table_number, capacity_min, capacity_max, 
 ('T-08', 6, 10, 'private_lounge', 'Private lagan feast lounge with Uzbek tapestries')
 ON CONFLICT (table_number) DO NOTHING;
 
+-- ====================================================================
 -- 9. Reservations with Transactional Exclusion Constraint
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.reservations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_code TEXT UNIQUE NOT NULL,
@@ -246,42 +292,57 @@ CREATE TABLE IF NOT EXISTS public.reservations (
     guest_count INT NOT NULL CHECK (guest_count > 0),
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
-    reservation_period TSTZRANGE NOT NULL,
+    reservation_period TSTZRANGE NOT NULL DEFAULT tstzrange(now(), now() + interval '2 hours', '[)'),
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'seated', 'completed', 'cancelled', 'no_show')),
     special_requests TEXT,
     cancellation_reason TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT check_valid_period CHECK (end_time > start_time),
-    -- POSTGRESQL GIST EXCLUSION CONSTRAINT:
-    -- Guarantees at engine level that two overlapping bookings CANNOT exist simultaneously for the same table
-    -- for active/confirmed/pending statuses.
-    CONSTRAINT no_overlapping_reservations EXCLUDE USING gist (
-        table_id WITH =,
-        reservation_period WITH &&
-    ) WHERE (status IN ('pending', 'confirmed', 'seated'))
+    CONSTRAINT check_valid_period CHECK (end_time > start_time)
 );
+
+-- Idempotently ensure the GiST exclusion constraint exists
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'no_overlapping_reservations'
+    ) THEN
+        ALTER TABLE public.reservations
+        ADD CONSTRAINT no_overlapping_reservations
+        EXCLUDE USING gist (
+            table_id WITH =,
+            reservation_period WITH &&
+        ) WHERE (status IN ('pending', 'confirmed', 'seated'));
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_reservations_start ON public.reservations(start_time);
 CREATE INDEX IF NOT EXISTS idx_reservations_status ON public.reservations(status);
 CREATE INDEX IF NOT EXISTS idx_reservations_code ON public.reservations(booking_code);
 
--- Automatically sync reservation_period column from start_time and end_time
+-- Automatically compute and synchronize reservation_period from start_time and end_time
 CREATE OR REPLACE FUNCTION public.sync_reservation_period()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.reservation_period := tstzrange(NEW.start_time, NEW.end_time, '[)');
+    IF NEW.start_time IS NOT NULL AND NEW.end_time IS NOT NULL THEN
+        IF NEW.end_time <= NEW.start_time THEN
+            RAISE EXCEPTION 'Reservation end_time (%) must be strictly after start_time (%)', NEW.end_time, NEW.start_time;
+        END IF;
+        NEW.reservation_period := tstzrange(NEW.start_time, NEW.end_time, '[)');
+    END IF;
     NEW.updated_at := now();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 DROP TRIGGER IF EXISTS trg_sync_reservation_period ON public.reservations;
 CREATE TRIGGER trg_sync_reservation_period
-BEFORE INSERT OR UPDATE OF start_time, end_time ON public.reservations
+BEFORE INSERT OR UPDATE ON public.reservations
 FOR EACH ROW EXECUTE FUNCTION public.sync_reservation_period();
 
+-- ====================================================================
 -- 10. Reservation Status History
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.reservation_status_history (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reservation_id UUID NOT NULL REFERENCES public.reservations(id) ON DELETE CASCADE,
@@ -292,7 +353,9 @@ CREATE TABLE IF NOT EXISTS public.reservation_status_history (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ====================================================================
 -- 11. Orders & Order Items
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number TEXT UNIQUE NOT NULL,
@@ -334,7 +397,9 @@ CREATE TABLE IF NOT EXISTS public.order_items (
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items(order_id);
 
+-- ====================================================================
 -- 12. Payments Table
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -347,7 +412,9 @@ CREATE TABLE IF NOT EXISTS public.payments (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ====================================================================
 -- 13. Customer Reviews
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -358,7 +425,9 @@ CREATE TABLE IF NOT EXISTS public.reviews (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ====================================================================
 -- 14. Notifications Log Table
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     channel TEXT NOT NULL CHECK (channel IN ('telegram', 'email', 'sms')),
@@ -372,7 +441,9 @@ CREATE TABLE IF NOT EXISTS public.notifications (
     sent_at TIMESTAMPTZ
 );
 
+-- ====================================================================
 -- 15. Admin Audit Logs
+-- ====================================================================
 CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     admin_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -385,7 +456,44 @@ CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
 );
 
 -- ====================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- 16. SECURITY FUNCTIONS & ROLE ESCALATION PREVENTION
+-- ====================================================================
+
+-- Secure Helper function: is current user an admin or manager?
+-- Uses SECURITY DEFINER with strict search_path to prevent hijacking
+CREATE OR REPLACE FUNCTION public.is_admin_or_manager()
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM public.profiles
+        WHERE id = auth.uid() AND role IN ('admin', 'manager')
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Privilege Escalation Blocker Trigger
+-- Strictly prevents users from altering their own or other users' roles
+-- unless the caller is already an admin or manager, or running as service_role (auth.uid() IS NULL)
+CREATE OR REPLACE FUNCTION public.prevent_profile_role_escalation()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.role IS DISTINCT FROM OLD.role THEN
+        IF auth.uid() IS NOT NULL AND NOT public.is_admin_or_manager() THEN
+            RAISE EXCEPTION 'Access Denied: You cannot modify user role or elevate privileges.';
+        END IF;
+    END IF;
+    NEW.updated_at := now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+DROP TRIGGER IF EXISTS trg_prevent_role_escalation ON public.profiles;
+CREATE TRIGGER trg_prevent_role_escalation
+BEFORE UPDATE ON public.profiles
+FOR EACH ROW EXECUTE FUNCTION public.prevent_profile_role_escalation();
+
+-- ====================================================================
+-- 17. ROW LEVEL SECURITY (RLS) POLICIES
 -- ====================================================================
 
 ALTER TABLE public.restaurant_settings ENABLE ROW LEVEL SECURITY;
@@ -406,50 +514,166 @@ ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Helper function: is current user an admin or manager?
-CREATE OR REPLACE FUNCTION public.is_admin_or_manager()
-RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE id = auth.uid() AND role IN ('admin', 'manager')
-    );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Public read permissions
+-- --------------------------------------------------------------------
+-- Public Read Policies (Anonymous / Authenticated)
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public can view settings" ON public.restaurant_settings;
 CREATE POLICY "Public can view settings" ON public.restaurant_settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can view hours" ON public.opening_hours;
 CREATE POLICY "Public can view hours" ON public.opening_hours FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can view exceptions" ON public.availability_exceptions;
 CREATE POLICY "Public can view exceptions" ON public.availability_exceptions FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can view active menu categories" ON public.menu_categories;
 CREATE POLICY "Public can view active menu categories" ON public.menu_categories FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "Public can view available menu items" ON public.menu_items;
 CREATE POLICY "Public can view available menu items" ON public.menu_items FOR SELECT USING (is_available = true);
+
+DROP POLICY IF EXISTS "Public can view menu images" ON public.menu_item_images;
 CREATE POLICY "Public can view menu images" ON public.menu_item_images FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public can view active tables" ON public.restaurant_tables;
 CREATE POLICY "Public can view active tables" ON public.restaurant_tables FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "Public can view approved reviews" ON public.reviews;
 CREATE POLICY "Public can view approved reviews" ON public.reviews FOR SELECT USING (is_approved = true);
 
--- User Profiles
+-- --------------------------------------------------------------------
+-- Admin Management for Catalog & Settings
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Admins manage settings" ON public.restaurant_settings;
+CREATE POLICY "Admins manage settings" ON public.restaurant_settings FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage hours" ON public.opening_hours;
+CREATE POLICY "Admins manage hours" ON public.opening_hours FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage exceptions" ON public.availability_exceptions;
+CREATE POLICY "Admins manage exceptions" ON public.availability_exceptions FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage categories" ON public.menu_categories;
+CREATE POLICY "Admins manage categories" ON public.menu_categories FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage menu items" ON public.menu_items;
+CREATE POLICY "Admins manage menu items" ON public.menu_items FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage menu images" ON public.menu_item_images;
+CREATE POLICY "Admins manage menu images" ON public.menu_item_images FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage tables" ON public.restaurant_tables;
+CREATE POLICY "Admins manage tables" ON public.restaurant_tables FOR ALL USING (public.is_admin_or_manager());
+
+-- --------------------------------------------------------------------
+-- User Profiles (Secure Role Protection)
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
 CREATE POLICY "Users can view their own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+-- Do not query profiles from this profile policy: that causes RLS recursion.
+-- The BEFORE UPDATE trigger below prevents non-admin role changes.
+CREATE POLICY "Users can update their own profile" ON public.profiles
+FOR UPDATE USING (auth.uid() = id)
+WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Admins can view and manage all profiles" ON public.profiles;
 CREATE POLICY "Admins can view and manage all profiles" ON public.profiles FOR ALL USING (public.is_admin_or_manager());
 
+-- --------------------------------------------------------------------
 -- Customer Addresses
-CREATE POLICY "Users manage own addresses" ON public.customer_addresses FOR ALL USING (auth.uid() = user_id);
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users view own addresses" ON public.customer_addresses;
+CREATE POLICY "Users view own addresses" ON public.customer_addresses FOR SELECT USING (auth.uid() = user_id OR public.is_admin_or_manager());
 
--- Reservations
-CREATE POLICY "Users can view own reservations" ON public.reservations FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Anyone can create a reservation" ON public.reservations FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins manage all reservations" ON public.reservations FOR ALL USING (public.is_admin_or_manager());
+DROP POLICY IF EXISTS "Users insert own addresses" ON public.customer_addresses;
+CREATE POLICY "Users insert own addresses" ON public.customer_addresses FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Orders
-CREATE POLICY "Users can view own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Anyone can create an order" ON public.orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins manage all orders" ON public.orders FOR ALL USING (public.is_admin_or_manager());
+DROP POLICY IF EXISTS "Users update own addresses" ON public.customer_addresses;
+CREATE POLICY "Users update own addresses" ON public.customer_addresses FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
--- Order Items
-CREATE POLICY "Users can view own order items" ON public.order_items FOR SELECT USING (
-    EXISTS (SELECT 1 FROM public.orders WHERE orders.id = order_items.order_id AND (orders.user_id = auth.uid() OR public.is_admin_or_manager()))
+DROP POLICY IF EXISTS "Users delete own addresses" ON public.customer_addresses;
+CREATE POLICY "Users delete own addresses" ON public.customer_addresses FOR DELETE USING (auth.uid() = user_id);
+
+-- --------------------------------------------------------------------
+-- Reservations (RESTRICTED: No Direct Public Inserts)
+-- All bookings must be routed through Server-Side API using Service Role Key
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Anyone can create a reservation" ON public.reservations;
+DROP POLICY IF EXISTS "Users can view own reservations" ON public.reservations;
+CREATE POLICY "Users can view own reservations" ON public.reservations FOR SELECT USING (
+    (auth.uid() IS NOT NULL AND auth.uid() = user_id) OR public.is_admin_or_manager()
 );
 
--- Admin Audit & Notifications: Admin only
+DROP POLICY IF EXISTS "Admins manage all reservations" ON public.reservations;
+CREATE POLICY "Admins manage all reservations" ON public.reservations FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Admins manage reservation history" ON public.reservation_status_history;
+CREATE POLICY "Admins manage reservation history" ON public.reservation_status_history FOR ALL USING (public.is_admin_or_manager());
+
+-- --------------------------------------------------------------------
+-- Orders & Order Items (RESTRICTED: No Direct Public Inserts)
+-- All orders must be routed through Server-Side API using Service Role Key
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Anyone can create an order" ON public.orders;
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
+CREATE POLICY "Users can view own orders" ON public.orders FOR SELECT USING (
+    (auth.uid() IS NOT NULL AND auth.uid() = user_id) OR public.is_admin_or_manager()
+);
+
+DROP POLICY IF EXISTS "Admins manage all orders" ON public.orders;
+CREATE POLICY "Admins manage all orders" ON public.orders FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Users and admins view order items" ON public.order_items;
+CREATE POLICY "Users and admins view order items" ON public.order_items FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM public.orders
+        WHERE orders.id = order_items.order_id
+        AND (orders.user_id = auth.uid() OR public.is_admin_or_manager())
+    )
+);
+
+DROP POLICY IF EXISTS "Admins manage order items" ON public.order_items;
+CREATE POLICY "Admins manage order items" ON public.order_items FOR ALL USING (public.is_admin_or_manager());
+
+-- --------------------------------------------------------------------
+-- Payments
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users view own payments" ON public.payments;
+CREATE POLICY "Users view own payments" ON public.payments FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM public.orders
+        WHERE orders.id = payments.order_id
+        AND (orders.user_id = auth.uid() OR public.is_admin_or_manager())
+    )
+);
+
+DROP POLICY IF EXISTS "Admins manage payments" ON public.payments;
+CREATE POLICY "Admins manage payments" ON public.payments FOR ALL USING (public.is_admin_or_manager());
+
+-- --------------------------------------------------------------------
+-- Reviews
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Authenticated users submit review" ON public.reviews;
+CREATE POLICY "Authenticated users submit review" ON public.reviews FOR INSERT WITH CHECK (
+    auth.uid() = user_id AND is_approved = false
+);
+
+DROP POLICY IF EXISTS "Admins manage reviews" ON public.reviews;
+CREATE POLICY "Admins manage reviews" ON public.reviews FOR ALL USING (public.is_admin_or_manager());
+
+-- --------------------------------------------------------------------
+-- Audit Logs & Notifications (Admin / Service Role Only)
+-- --------------------------------------------------------------------
+DROP POLICY IF EXISTS "Admin audit logs viewable only by admins" ON public.admin_audit_logs;
 CREATE POLICY "Admin audit logs viewable only by admins" ON public.admin_audit_logs FOR ALL USING (public.is_admin_or_manager());
+
+DROP POLICY IF EXISTS "Notifications viewable only by admins" ON public.notifications;
 CREATE POLICY "Notifications viewable only by admins" ON public.notifications FOR ALL USING (public.is_admin_or_manager());
+
+-- ====================================================================
+-- END OF MIGRATION 001
+-- ====================================================================
+
+COMMIT;
